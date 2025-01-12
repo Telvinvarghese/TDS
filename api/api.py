@@ -4,7 +4,7 @@ import os
 
 app = Flask(__name__)
 
-# Define the path to the JSON file
+# Define the path to the JSON file inside the 'app' folder
 json_file_path = os.path.join(os.path.dirname(__file__), 'q-vercel-python.json')
 
 # Load student marks from the JSON file
