@@ -17,34 +17,42 @@ def load_student_marks():
 # Create a custom request handler
 class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
-        # Parse query parameters
-        query = parse_qs(self.path.split('?')[1] if '?' in self.path else "")
-        names = query.get('name', [])
+        # Check if the path is '/api'
+        if self.path.startswith('/api'):
+            # Parse query parameters
+            query = parse_qs(self.path.split('?')[1] if '?' in self.path else "")
+            names = query.get('name', [])
 
-        # Load student marks from the JSON file
-        student_marks = load_student_marks()
+            # Load student marks from the JSON file
+            student_marks = load_student_marks()
 
-        # Look for the student marks in the list of dictionaries
-        marks = []
-        for name in names:
-            # Search for the student's mark based on the name
-            student = next((item for item in student_marks if item["name"] == name), None)
-            
-            if student:
-                marks.append(student["marks"])
-            else:
-                marks.append(f"Student {name} not found")
+            # Look for the student marks in the list of dictionaries
+            marks = []
+            for name in names:
+                # Search for the student's mark based on the name
+                student = next((item for item in student_marks if item["name"] == name), None)
+                
+                if student:
+                    marks.append(student["marks"])
+                else:
+                    marks.append(f"Student {name} not found")
 
-        # Create JSON response
-        response = json.dumps({"marks": marks})
+            # Create JSON response
+            response = json.dumps({"marks": marks})
 
-        # Send response header
-        self.send_response(200)
-        self.send_header('Content-type', 'application/json')
-        self.end_headers()
+            # Send response header
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
 
-        # Send JSON response body
-        self.wfile.write(response.encode('utf-8'))
+            # Send JSON response body
+            self.wfile.write(response.encode('utf-8'))
+        else:
+            # Return 404 if path is not '/api'
+            self.send_response(404)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+            self.wfile.write(b"404 Not Found")
 
 # Run the HTTP server
 def run(server_class=HTTPServer, handler_class=RequestHandler, port=8000):
